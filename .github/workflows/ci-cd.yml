@@ -1,0 +1,110 @@
+name: CI/CD Pipeline - Skin Disease Detector
+
+# Kapan pipeline ini dijalankan?
+on:
+  push:
+    branches: [ main ]      # Setiap push ke branch main
+  pull_request:
+    branches: [ main ]      # Setiap ada pull request ke main
+
+jobs:
+  # ============================================
+  # JOB 1: TEST
+  # ============================================
+  test:
+    name: 🧪 Test Application
+    runs-on: ubuntu-latest    # Jalankan di mesin Ubuntu
+
+    steps:
+      # Langkah 1: Ambil code dari GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Langkah 2: Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Langkah 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install flask transformers Pillow numpy prometheus-flask-exporter torchvision
+
+      # Langkah 4: Test syntax code
+      - name: Check Python syntax
+        run: python -m py_compile app/app.py
+
+      # Langkah 5: Test apakah app bisa start
+      - name: Test app starts
+        run: |
+          cd app
+          timeout 30 python app.py &
+          sleep 20
+          curl http://localhost:5000/health || exit 1
+
+  # ============================================
+  # JOB 2: BUILD & PUSH DOCKER IMAGE
+  # ============================================
+  build-and-push:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test              # Hanya jalan kalau Job 1 (test) sukses!
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Login ke Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # Setup Docker Buildx (untuk build yang lebih cepat)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Build dan push image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            astrogurldev/skin-disease-detector:latest
+            astrogurldev/skin-disease-detector:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # JOB 3: DEPLOY KE HUGGINGFACE SPACES
+  # ============================================
+  deploy:
+    name: 🚀 Deploy to HuggingFace Spaces
+    runs-on: ubuntu-latest
+    needs: build-and-push    # Hanya jalan kalau Job 2 sukses!
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Push ke HuggingFace Spaces
+      - name: Deploy to HuggingFace Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "ci@github.com"
+          git config --global user.name "GitHub Actions"
+          git clone https://astrogurldev:$HF_TOKEN@huggingface.co/spaces/astrogurldev/skin-disease-k8s hf-space
+          cp app/app.py hf-space/
+          cp app/requirements.txt hf-space/
+          cp -r app/templates hf-space/
+          cp docker/Dockerfile hf-space/
+          cd hf-space
+          git add .
+          git diff --staged --quiet || git commit -m "auto-deploy from GitHub Actions 🚀"
+          git push
