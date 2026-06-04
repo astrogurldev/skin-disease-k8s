@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skin-disease-detector
+  labels:
+    app: skin-disease-detector
+spec:
+  replicas: 2          # Mulai dengan 2 pod
+  selector:
+    matchLabels:
+      app: skin-disease-detector
+  template:
+    metadata:
+      labels:
+        app: skin-disease-detector
+    spec:
+      containers:
+      - name: skin-disease-detector
+        image: astrogurldev/skin-disease-detector:v1   # Image dari Docker Hub kamu!
+        ports:
+        - containerPort: 5000
+        env:
+        - name: POD_NAME          # Inject nama pod ke dalam container
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name    # Kubernetes ambil nama pod otomatis
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 120    # Tunggu 2 menit dulu baru cek
+          periodSeconds: 15
+          failureThreshold: 5
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 180    # Tunggu 3 menit dulu baru cek
+          periodSeconds: 20
+          failureThreshold: 3

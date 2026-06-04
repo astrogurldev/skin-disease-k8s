@@ -1,0 +1,18 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: skin-disease-detector-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: skin-disease-detector
+  minReplicas: 2        # Minimum 2 pod (biar selalu ada backup)
+  maxReplicas: 10       # Maksimum 10 pod
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50    # Scale up kalau CPU rata-rata > 50%
