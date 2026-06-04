@@ -29,8 +29,8 @@ jobs:
       # Langkah 3: Install dependencies
       - name: Install dependencies
         run: |
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install flask transformers Pillow numpy prometheus-flask-exporter
+          pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cpu
+          pip install flask transformers==4.40.0 Pillow numpy prometheus-flask-exporter
 
       # Langkah 4: Test syntax code
       - name: Check Python syntax
