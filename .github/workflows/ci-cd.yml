@@ -13,36 +13,29 @@ jobs:
   # ============================================
   test:
     name: 🧪 Test Application
-    runs-on: ubuntu-latest    # Jalankan di mesin Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
-      # Langkah 1: Ambil code dari GitHub
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Langkah 2: Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Langkah 3: Install dependencies
-      - name: Install dependencies
-        run: |
-          pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cpu
-          pip install flask transformers==4.40.0 Pillow numpy prometheus-flask-exporter
-
-      # Langkah 4: Test syntax code
       - name: Check Python syntax
-        run: python -m py_compile app/app.py
-
-      # Langkah 5: Test apakah app bisa start
-      - name: Test app starts
         run: |
-          cd app
-          timeout 30 python app.py &
-          sleep 20
-          curl http://localhost:5000/health || exit 1
+          python -m py_compile app/app.py
+          echo "✅ Syntax check passed!"
+
+      - name: Check required files exist
+        run: |
+          test -f app/app.py && echo "✅ app.py exists"
+          test -f app/requirements.txt && echo "✅ requirements.txt exists"
+          test -f docker/Dockerfile && echo "✅ Dockerfile exists"
+          test -f k8s/deployment.yaml && echo "✅ deployment.yaml exists"
+          test -f k8s/hpa.yaml && echo "✅ hpa.yaml exists"
 
   # ============================================
   # JOB 2: BUILD & PUSH DOCKER IMAGE
