@@ -6,33 +6,46 @@
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-> A production-grade MLOps project demonstrating how to deploy, scale, and monitor a Machine Learning model using Docker and Kubernetes.
+> A production-grade MLOps project demonstrating how to deploy, scale, monitor, and automate a Machine Learning model using Docker, Kubernetes, and CI/CD.
+
+[![CI/CD Pipeline](https://github.com/astrogurldev/skin-disease-k8s/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/astrogurldev/skin-disease-k8s/actions/workflows/ci-cd.yml)
 
 ---
 
 ## 🎯 Project Overview
 
-This project deploys a **skin disease detection ML model** (DINOv2 fine-tuned) as a containerized microservice with full **auto-scaling** and **monitoring** capabilities.
+This project deploys a **skin disease detection ML model** (DINOv2 fine-tuned) as a containerized microservice with full **auto-scaling**, **monitoring**, and **CI/CD pipeline** capabilities.
 
 **The ML model can detect 19 types of skin diseases** including Melanoma, Impetigo, Psoriasis, and more — with confidence scores for top 3 predictions.
+
+🌐 **Live Demo:** https://astrogurldev-skin-disease-k8s.hf.space
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-User Request
-     ↓
-Kubernetes Service (Load Balancer)
-     ↓
+Developer pushes code
+        ↓
+GitHub Actions (CI/CD)
+        ↓
+┌───────────────────────────────────┐
+│  Test → Build Docker → Deploy     │
+└───────────────────────────────────┘
+        ↓
+Docker Hub (Image Registry)
+        ↓
+Kubernetes Cluster (Minikube)
+        ↓
 ┌─────────┐  ┌─────────┐  ┌─────────┐
 │  Pod 1  │  │  Pod 2  │  │  Pod N  │  ← Auto-scaled by HPA
 │ [Flask] │  │ [Flask] │  │ [Flask] │
 │ [DINOv2]│  │ [DINOv2]│  │ [DINOv2]│
 └─────────┘  └─────────┘  └─────────┘
-     ↓
-Prometheus (Metrics) → Grafana (Dashboard)
+        ↓
+Prometheus → Grafana (Monitoring Dashboard)
 ```
 
 ---
@@ -45,6 +58,25 @@ Prometheus (Metrics) → Grafana (Dashboard)
 - 📈 **Auto-Scaling**: HPA scales pods from 2 → 10 based on CPU usage (threshold: 50%)
 - 📊 **Monitoring**: Real-time metrics with Prometheus + Grafana dashboard
 - 🏥 **Health Checks**: Readiness and Liveness probes for zero-downtime
+- 🔄 **CI/CD Pipeline**: GitHub Actions — auto test, build, push, and deploy on every push
+
+---
+
+## 🔄 CI/CD Pipeline
+
+Every push to `main` branch automatically triggers:
+
+```
+Push to GitHub
+      ↓
+🧪 Test (syntax check + file validation)    ~5s
+      ↓
+🐳 Build & Push Docker image to Docker Hub  ~24s
+      ↓
+🚀 Deploy to HuggingFace Spaces             ~7s
+      ↓
+✅ Live app updated! Total: ~48s
+```
 
 ---
 
@@ -58,6 +90,8 @@ Prometheus (Metrics) → Grafana (Dashboard)
 | **Orchestration** | Kubernetes, Minikube |
 | **Auto-Scaling** | Horizontal Pod Autoscaler (HPA) |
 | **Monitoring** | Prometheus, Grafana |
+| **CI/CD** | GitHub Actions |
+| **Deployment** | HuggingFace Spaces |
 
 ---
 
@@ -111,17 +145,14 @@ docker-compose up -d
 HPA automatically scales pods based on CPU usage:
 
 ```bash
-# Watch pods scale in real-time
 kubectl get pods -w
-
-# Check HPA status
 kubectl get hpa
 ```
 
 When CPU exceeds 50%, Kubernetes automatically adds new pods:
 ```
 TARGETS       MINPODS   MAXPODS   REPLICAS
-cpu: 94%/50%  2         10        4          ← Scaled up automatically!
+cpu: 94%/50%  2         10        4    ← Scaled up automatically!
 ```
 
 ---
@@ -130,22 +161,33 @@ cpu: 94%/50%  2         10        4          ← Scaled up automatically!
 
 ```
 skin-disease-k8s/
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml           # GitHub Actions CI/CD pipeline
 ├── app/
-│   ├── app.py              # Flask API + ML model
-│   ├── requirements.txt    # Python dependencies
+│   ├── app.py                  # Flask API + ML model
+│   ├── requirements.txt        # Python dependencies
 │   └── templates/
-│       └── index.html      # Web UI
+│       └── index.html          # Web UI
 ├── docker/
-│   └── Dockerfile          # Docker image definition
+│   └── Dockerfile              # Docker image definition
 ├── k8s/
-│   ├── deployment.yaml     # Kubernetes Deployment
-│   ├── service.yaml        # Kubernetes Service
-│   └── hpa.yaml            # Horizontal Pod Autoscaler
+│   ├── deployment.yaml         # Kubernetes Deployment
+│   ├── service.yaml            # Kubernetes Service
+│   └── hpa.yaml                # Horizontal Pod Autoscaler
 ├── monitoring/
-│   ├── docker-compose.yml  # Prometheus + Grafana stack
-│   └── prometheus.yml      # Prometheus config
+│   ├── docker-compose.yml      # Prometheus + Grafana stack
+│   └── prometheus.yml          # Prometheus config
 └── README.md
 ```
+
+---
+
+## 🔗 Links
+
+- 🌐 **Live App:** https://astrogurldev-skin-disease-k8s.hf.space
+- 🐳 **Docker Hub:** https://hub.docker.com/r/astrogurldev/skin-disease-detector
+- ⚙️ **CI/CD Pipeline:** https://github.com/astrogurldev/skin-disease-k8s/actions
 
 ---
 
