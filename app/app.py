@@ -29,12 +29,37 @@ model.eval()  # mode inference, bukan training
 print("✅ Model loaded!")
 
 CLASS_NAMES = [
-    'Basal Cell Carcinoma', 'Darier Disease', 'Epidermolysis Bullosa',
-    'Hailey-Hailey Disease', 'Herpes Simplex', 'Impetigo', 'Larva Migrans',
-    'Leprosy Borderline', 'Leprosy Lepromatous', 'Leprosy Tuberculoid',
-    'Lichen Planus', 'Lupus Erythematosus', 'Melanoma',
-    'Molluscum Contagiosum', 'Mycosis Fungoides', 'Neurofibromatosis',
-    'Papilloma', 'Psoriasis', 'Tinea', 'Vitiligo', 'Warts'
+    'Basal Cell Carcinoma',
+    'Darier\'s Disease',
+    'Epidermolysis Bullosa Pruriginosa',
+    'Hailey-Hailey Disease',
+    'Herpes Simplex',
+    'Impetigo',
+    'Larva Migrans',
+    'Leprosy Borderline',
+    'Leprosy Lepromatous',
+    'Leprosy Tuberculoid',
+    'Lichen Planus',
+    'Lupus Erythematosus Chronicus Discoides',
+    'Melanoma',
+    'Molluscum Contagiosum',
+    'Mycosis Fungoides',
+    'Neurofibromatosis',
+    'Papilomatosis Confluentes And Reticulate',
+    'Pediculosis Capitis',
+    'Pityriasis Rosea',
+    'Porokeratosis Actinic',
+    'Psoriasis',
+    'Tinea Corporis',
+    'Tinea Nigra',
+    'Tungiasis',
+    'Actinic Keratosis',
+    'Dermatofibroma',
+    'Nevus',
+    'Pigmented Benign Keratosis',
+    'Seborrheic Keratosis',
+    'Squamous Cell Carcinoma',
+    'Vascular Lesion'
 ]
 
 # ============================================
