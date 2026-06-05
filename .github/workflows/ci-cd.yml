@@ -85,19 +85,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Push ke HuggingFace Spaces
-      - name: Deploy to HuggingFace Spaces
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          git config --global user.email "ci@github.com"
-          git config --global user.name "GitHub Actions"
-          git clone https://astrogurldev:$HF_TOKEN@huggingface.co/spaces/astrogurldev/skin-disease-k8s hf-space
-          cp app/app.py hf-space/
-          cp app/requirements.txt hf-space/
-          cp -r app/templates hf-space/
-          cp docker/Dockerfile hf-space/
-          cd hf-space
-          git add .
-          git diff --staged --quiet || git commit -m "auto-deploy from GitHub Actions 🚀"
-          git push
+      
