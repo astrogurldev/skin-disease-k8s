@@ -350,7 +350,12 @@
                     <div class="results-title">Hasil Diagnosis</div>
                     <div class="results-sub" id="resultsSub"></div>
                 </div>
-                <div class="pod-lbl" id="podLbl"></div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button onclick="resetUpload()" style="padding:6px 14px; border:1px solid #e2e8f0; border-radius:6px; background:#fff; font-size:12px; color:#475569; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Upload Baru
+                    </button>
+                    <div class="pod-lbl" id="podLbl"></div>
+                </div>
             </div>
             <div id="resultsList"></div>
             <div class="disclaimer">
@@ -508,6 +513,14 @@
             analyzeBtn.disabled = false;
         }
     }
+    function resetUpload() {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('uploadZone').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('resultsContainer').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'flex';
+}
 </script>
 </body>
 </html>
